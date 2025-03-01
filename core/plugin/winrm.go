@@ -3,19 +3,20 @@ package plugin
 import (
 	"Yasso/config"
 	"fmt"
-	"github.com/masterzen/winrm"
 	"net"
 	"os"
+
+	"github.com/masterzen/winrm"
 )
 
 func WinRMAuth(info config.ServiceConn, user, pass string) (*winrm.Client, bool, error) {
 	var err error
 	params := winrm.DefaultParameters
-	// 设置代理认证
+	// Set proxy authentication
 	params.Dial = func(network, addr string) (net.Conn, error) {
 		return net.DialTimeout("tcp", fmt.Sprintf("%s:%v", info.Hostname, info.Port), info.Timeout)
 	}
-	// 设置输入
+	// Set input
 	endpoint := winrm.NewEndpoint("other-host", 5985, false, false, nil, nil, nil, 0)
 	client, err := winrm.NewClientWithParameters(endpoint, user, pass, params)
 	stdout := os.Stdout

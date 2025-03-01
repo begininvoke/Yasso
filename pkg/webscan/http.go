@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"crypto/tls"
 	"fmt"
-	"golang.org/x/text/encoding/simplifiedchinese"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -16,6 +15,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 //TODO: dismap RespLab
@@ -70,7 +71,7 @@ func DefaultRequests(Url string, timeout time.Duration) []RespLab {
 	var response_status_code string
 	var res []string
 
-	// 设置http请求客户端
+	// Set up HTTP request client
 	client := &http.Client{
 		Timeout: time.Duration(timeout),
 		Transport: &http.Transport{
@@ -85,26 +86,26 @@ func DefaultRequests(Url string, timeout time.Duration) []RespLab {
 	if err != nil {
 		return nil
 	}
-	// 设置默认请求头
+	// Set default request headers
 	for key, value := range config.DefaultHeader {
 		req.Header.Set(key, value)
 	}
-	// 做http请求
+	// Make HTTP request
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil
 	}
 	defer resp.Body.Close()
 
-	// 获取请求的状态马
+	// Get request status code
 	var status_code = resp.StatusCode
 	response_status_code = strconv.Itoa(status_code)
 
-	//TODO: 根据请求来拦截状态码，如果是30x则需要拦截url进行重定向
+	//TODO: Intercept status code based on request, if it's 30x then need to intercept URL for redirection
 
 	if len(regexp.MustCompile("30").FindAllStringIndex(response_status_code, -1)) == 1 {
-		// 进行重定向
-		redirect_path := resp.Header.Get("Location") // 拦截url进行重定向请求
+		// Perform redirection
+		redirect_path := resp.Header.Get("Location") // Intercept URL for redirection request
 		if len(regexp.MustCompile("http").FindAllStringIndex(redirect_path, -1)) == 1 {
 			redirect_url = redirect_path
 		} else {
@@ -119,7 +120,7 @@ func DefaultRequests(Url string, timeout time.Duration) []RespLab {
 				return http.ErrUseLastResponse
 			},
 		}
-		// 设置重定向请求
+		// Set up redirection request
 		req, err := http.NewRequest("GET", redirect_url, nil)
 		if err != nil {
 			return nil
@@ -133,7 +134,7 @@ func DefaultRequests(Url string, timeout time.Duration) []RespLab {
 		}
 		defer resp.Body.Close()
 
-		//TODO: 解决两次的30x跳转问题
+		//TODO: Solve the problem of double 30x redirects
 		var twoStatusCode = resp.StatusCode
 		responseStatusCodeTwo := strconv.Itoa(twoStatusCode)
 		if len(regexp.MustCompile("30").FindAllStringIndex(responseStatusCodeTwo, -1)) == 1 {
@@ -325,7 +326,7 @@ func CustomRequests(Url string, timeout time.Duration, Method string, Path strin
 	return RespData
 }
 
-//dismap 解析IP
+// Parse IP for dismap
 
 func ParseUrl(host string, port string) string {
 	if port == "80" {

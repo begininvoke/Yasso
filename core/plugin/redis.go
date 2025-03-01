@@ -19,7 +19,7 @@ func RedisAuthConn(info config.ServiceConn, user, pass string) (net.Conn, bool, 
 	if err != nil {
 		return conn, false, err
 	}
-	// 认证
+	// Authentication
 	_, err = conn.Write([]byte(fmt.Sprintf("auth %s\r\n", pass)))
 	if err != nil {
 		return conn, false, err
@@ -86,7 +86,7 @@ func redisInfo(conn net.Conn, reply string) string {
 	var (
 		dbfilename string
 	)
-	// 读取filename
+	// Read filename
 	_, err := conn.Write([]byte(fmt.Sprintf("CONFIG GET dbfilename\r\n")))
 	if err != nil {
 		return ""

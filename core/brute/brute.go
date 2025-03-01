@@ -11,14 +11,14 @@ import (
 )
 
 type Brute struct {
-	user        []string           // 被枚举的用户名
-	pass        []string           // 被枚举的密码
-	bruteMethod interface{}        // 枚举方法
-	service     string             // 服务命令
-	serviceConn config.ServiceConn // 服务连接
-	thread      int                // 执行爆破的线程数
-	output      string             // 结果输出路径
-	noBrute     bool               // 是否执行爆破
+	user        []string           // Username to be enumerated
+	pass        []string           // Password to be enumerated
+	bruteMethod interface{}        // Enumeration method
+	service     string             // Service command
+	serviceConn config.ServiceConn // Service connection
+	thread      int                // Number of threads for brute force
+	output      string             // Result output path
+	noBrute     bool               // Whether to execute brute force
 }
 
 func NewBrute(user, pass []string, method interface{}, service string, serviceConn config.ServiceConn, thread int, noBrute bool, output string) *Brute {
@@ -34,12 +34,12 @@ func NewBrute(user, pass []string, method interface{}, service string, serviceCo
 	}
 }
 
-// RunEnumeration 开始蛮力枚举
+// RunEnumeration Start brute force enumeration
 func (b *Brute) RunEnumeration() {
 	if b.noBrute == false {
 		var wg sync.WaitGroup
 		if len(b.user) == 0 {
-			b.user = config.UserDict[b.service] // 获取对应端口的user列表
+			b.user = config.UserDict[b.service] // Get the user list for the corresponding port
 		}
 		if len(b.pass) == 0 {
 			b.pass = config.PassDict
@@ -50,9 +50,9 @@ func (b *Brute) RunEnumeration() {
 		} else {
 			t = b.thread
 		}
-		// 分割密码
-		num := int(math.Ceil(float64(len(b.pass)) / float64(b.thread))) // 每个协程的user数量
-		// 分割用户名
+		// Split passwords
+		num := int(math.Ceil(float64(len(b.pass)) / float64(b.thread))) // Number of users per goroutine
+		// Split usernames
 		all := map[int][]string{}
 		for i := 1; i <= t; i++ {
 			for j := 0; j < num; j++ {
@@ -69,7 +69,7 @@ func (b *Brute) RunEnumeration() {
 				defer wg.Done()
 				for _, p := range tmp {
 					for _, u := range b.user {
-						// 开始爆破,带有用户名密码的服务
+						// Start brute force, service with username and password
 						if strings.Contains(p, "{user}") {
 							p = strings.ReplaceAll(p, "{user}", u)
 						}
@@ -84,7 +84,7 @@ func (b *Brute) RunEnumeration() {
 	}
 }
 
-// call 函数调用,爆破将会调用该模块去执行操作操作
+// call Function call, brute force will call this module to perform operations
 func (b *Brute) call(params ...interface{}) []reflect.Value {
 	f := reflect.ValueOf(b.bruteMethod)
 	if len(params) != f.Type().NumIn() {
@@ -101,7 +101,7 @@ func (b *Brute) call(params ...interface{}) []reflect.Value {
 	return f.Call(args)
 }
 
-// 结果验证
+// Result verification
 func (b *Brute) export(v []reflect.Value, host string, port int, service, user, pass string, output string) bool {
 	var mutex sync.Mutex
 	for _, value := range v {

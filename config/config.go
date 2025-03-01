@@ -2,7 +2,7 @@ package config
 
 import "time"
 
-// ServiceConn service 连接所需要的结构体
+// ServiceConn Service connection structure
 type ServiceConn struct {
 	Hostname  string
 	Port      int
@@ -35,7 +35,7 @@ var DefaultHeader = map[string]string{
 }
 
 type Format struct {
-	Host          string     `json:"Host,omitempty"` // 主机地址
+	Host          string     `json:"Host,omitempty"` // Host address
 	Port          []int      `json:"Port,omitempty"`
 	Service       []*Service `json:"Service,omitempty"`
 	Vulnerability []string   `json:"Vulnerability,omitempty"`
@@ -44,7 +44,7 @@ type Format struct {
 type Service struct {
 	Name        string              `json:"Name,omitempty"`
 	Information []string            `json:"Information,omitempty"`
-	WeakPass    []map[string]string `json:"WeakPass,omitempty"` // 一个服务可能有好几个口令,所以采用切片类型
+	WeakPass    []map[string]string `json:"WeakPass,omitempty"` // A service may have multiple credentials, so use a slice type
 }
 
 var JSONSave []*Format

@@ -13,7 +13,7 @@ func testrdp(target string) {
 	//target = "180.102.17.30:3389"
 	var err error
 	g := NewClient(target, glog.NONE)
-	//SSL协议登录测试
+	//SSL protocol login test
 	err = g.LoginForSSL(domain, username, password)
 	if err == nil {
 		fmt.Println("Login Success")
@@ -23,7 +23,7 @@ func testrdp(target string) {
 		fmt.Println("Login Error:", err)
 		return
 	}
-	//RDP协议登录测试
+	//RDP protocol login test
 	err = g.LoginForRDP(domain, username, password)
 	if err == nil {
 		fmt.Println("Login Success")

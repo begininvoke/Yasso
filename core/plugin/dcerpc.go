@@ -29,11 +29,11 @@ func DceRpcOSVersion(ip string, port int, timeout time.Duration) (bool, string) 
 	if err != nil {
 		return false, ""
 	}
-	digit := osDigits(ip) // 获取位数
+	digit := osDigits(ip) // Get the bit count
 	osVersionBytes := buffer[int(0xa0)-54+10 : int(0xa0)-54+18]
-	majorVersion := osVersionBytes[0:1] // 主要版本
-	MinorVersion := osVersionBytes[1:2] // 次要版本
-	BuildNumber := osVersionBytes[2:4]  // 构建号
+	majorVersion := osVersionBytes[0:1] // Major version
+	MinorVersion := osVersionBytes[1:2] // Minor version
+	BuildNumber := osVersionBytes[2:4]  // Build number
 	osVersion := fmt.Sprintf("Windows Verison %d.%d Build %v %v", majorVersion[0], MinorVersion[0], binary.LittleEndian.Uint16(BuildNumber), digit)
 
 	//infoLengthBytes := buffer[int(0xa0)-54+2 : int(0xa0)-54+4]

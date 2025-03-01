@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// RMIConn 识别rmi服务方式
+// RMIConn Method to identify RMI service
 func RMIConn(info config.ServiceConn, user, pass string) bool {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%v:%v", info.Hostname, info.Port), info.Timeout)
 	if err != nil {
@@ -32,7 +32,7 @@ func RMIConn(info config.ServiceConn, user, pass string) bool {
 	} else if hex.EncodeToString(reply[0:1]) != "4e" {
 		return false
 	}
-	// 这里解析出字符串
+	// Parse the string here
 	banner := byteToString(reply)
 	logger.Success(fmt.Sprintf("%v [%v]", fmt.Sprintf("%v:%v", info.Hostname, info.Port), banner))
 	return true

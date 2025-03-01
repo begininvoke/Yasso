@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// HandlePorts 解析端口格式
+// HandlePorts Parse port format
 func HandlePorts(ports string) ([]int, error) {
 	var scanPorts []int
 	slices := strings.Split(ports, ",")

@@ -31,7 +31,7 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 	defer func() {
 		logger.Info("brute service complete")
 	}()
-	// 先解析传过来的ips列表
+	// First parse the IP list passed in
 	if ipd == "" {
 		logger.Fatal("need ips to parse")
 		return
@@ -68,7 +68,7 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 			}()
 		}
 		for _, ip := range ips {
-			// 带有端口的不进行扫描，直接加入
+			// IP addresses with ports will not be scanned, directly added
 			if strings.Contains(ip, ":") {
 				ipAlive = append(ipAlive, ip)
 				continue
@@ -76,16 +76,16 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 				ipChannel <- ip
 			}
 		}
-		close(ipChannel) // 防止死锁
+		close(ipChannel) // Prevent deadlock
 		wg.Wait()
 	} else {
 		ipAlive = ips
 	}
 
 	logger.Info(fmt.Sprintf("start brute service %v", strings.Split(module, ",")))
-	// 这里获取到了ip列表,格式各种各样 www.baidu.com:80 192.168.248.1 192.168.248.1:445
-	for _, each := range strings.Split(module, ",") { // 遍历每一个服务
-		// 这里获取到对应的服务和端口
+	// Here we get the IP list, in various formats like www.baidu.com:80 192.168.248.1 192.168.248.1:445
+	for _, each := range strings.Split(module, ",") { // Iterate through each service
+		// Here we get the corresponding service and port
 		service := strings.Split(each, ":")
 		if len(service) >= 3 || len(service) <= 0 {
 			logger.Fatal("brute service format is error")
@@ -95,10 +95,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "ssh":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 22
 			}
 			if err != nil {
@@ -109,10 +109,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "mongo":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 27017
 			}
 			if err != nil {
@@ -123,10 +123,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "mysql":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 3306
 			}
 			if err != nil {
@@ -137,10 +137,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "rdp":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 3389
 			}
 			if err != nil {
@@ -151,10 +151,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "redis":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 6379
 			}
 			if err != nil {
@@ -165,10 +165,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "smb":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 445
 			}
 			if err != nil {
@@ -179,10 +179,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "winrm":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 5985
 			}
 			if err != nil {
@@ -193,10 +193,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "postgres":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 5432
 			}
 			if err != nil {
@@ -207,10 +207,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "mssql":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 1433
 			}
 			if err != nil {
@@ -221,10 +221,10 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 		case "ftp":
 			var p int
 			if len(service) == 2 {
-				// 带端口,采用用户自带端口
+				// With port, use the user-provided port
 				p, err = strconv.Atoi(service[1])
 			} else {
-				// 不带端口,采用默认
+				// Without port, use the default
 				p = 21
 			}
 			if err != nil {
@@ -240,9 +240,9 @@ func BruteService(user, pass string, ipd string, module string, thread int, time
 
 }
 
-// 执行爆破的函数
+// Execute the brute force function
 func run(ips []string, port int, user, pass []string, timeout time.Duration, thread int, service string, method interface{}) {
-	var ipChannel = make(chan string, 1000) // 二次复用
+	var ipChannel = make(chan string, 1000) // Reuse for the second time
 	var mutex sync.Mutex
 	var wg sync.WaitGroup
 	for i := 0; i < thread; i++ {
@@ -250,7 +250,7 @@ func run(ips []string, port int, user, pass []string, timeout time.Duration, thr
 		go func() {
 			defer wg.Done()
 			for ip := range ipChannel {
-				// 这里获取到每一个ip
+				// Here we get each IP
 				mutex.Lock()
 				brute.NewBrute(user, pass, method, service, config.ServiceConn{
 					Hostname: ip,
@@ -262,9 +262,9 @@ func run(ips []string, port int, user, pass []string, timeout time.Duration, thr
 		}()
 	}
 	for _, ip := range ips {
-		// 带有端口的不进行扫描，直接直接跳过
+		// IP addresses with ports will not be scanned, skip directly
 		if strings.Count(ip, ":") == 1 {
-			if strings.Split(ip, ":")[1] == strconv.Itoa(port) { // 带端口,且端口和需要爆破的端口号相同
+			if strings.Split(ip, ":")[1] == strconv.Itoa(port) { // With port, and the port is the same as the port to be brute forced
 				ipChannel <- strings.Split(ip, ":")[0]
 			} else {
 				continue
@@ -273,6 +273,6 @@ func run(ips []string, port int, user, pass []string, timeout time.Duration, thr
 			ipChannel <- ip
 		}
 	}
-	close(ipChannel) // 防止死锁
+	close(ipChannel) // Prevent deadlock
 	wg.Wait()
 }

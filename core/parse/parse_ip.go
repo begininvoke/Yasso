@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/projectdiscovery/cdncheck"
 	"net"
 	"os"
 	"path"
@@ -15,9 +14,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/projectdiscovery/cdncheck"
 )
 
-// ReadFile 从文件中读取数据
+// ReadFile Read data from a file
 func ReadFile(filename string) ([]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -34,11 +35,11 @@ func ReadFile(filename string) ([]string, error) {
 			re = append(re, text)
 		}
 	}
-	re = Duplicate(re) // 去重
+	re = Duplicate(re) // Remove duplicates
 	return re, nil
 }
 
-// ConvertDomainToIpAddress 将域名转换成ip地址
+// ConvertDomainToIpAddress Convert domain names to IP addresses
 func ConvertDomainToIpAddress(domains []string, thread int) ([]string, error) {
 	checkChan := make(chan string, 100)
 	var wg sync.WaitGroup
@@ -49,7 +50,7 @@ func ConvertDomainToIpAddress(domains []string, thread int) ([]string, error) {
 			defer wg.Done()
 			for host := range checkChan {
 				if strings.Count(host, ".") == 3 && len(strings.Split(host, ":")) == 2 {
-					// 这种是带有端口的ip地址
+					// This is an IP address with a port
 					re = append(re, host)
 					continue
 				}
@@ -58,7 +59,7 @@ func ConvertDomainToIpAddress(domains []string, thread int) ([]string, error) {
 					continue
 				}
 				if ip != nil {
-					// 证明存在cdn，直接丢掉即可(不跑带有cdn的域名)
+					// This proves there is a CDN, just drop it (don't scan domain names with CDN)
 					if len(ip) >= 2 {
 						logger.Info(fmt.Sprintf("%s has cdn %v", host, ip[:]))
 						continue
@@ -82,11 +83,11 @@ func ConvertDomainToIpAddress(domains []string, thread int) ([]string, error) {
 	}
 	close(checkChan)
 	wg.Wait()
-	re = Duplicate(re) // 去重
+	re = Duplicate(re) // Remove duplicates
 	return re, nil
 }
 
-// cdnFilter cdn过滤器
+// cdnFilter CDN filter
 func cdnFilter(ip string, client *cdncheck.Client) string {
 	if found, _, err := client.Check(net.ParseIP(ip)); found && err == nil {
 		return ip
@@ -94,7 +95,7 @@ func cdnFilter(ip string, client *cdncheck.Client) string {
 	return ""
 }
 
-// Duplicate 去重
+// Duplicate Remove duplicates
 func Duplicate(slc []string) []string {
 	var re []string
 	temp := map[string]byte{}
@@ -108,7 +109,7 @@ func Duplicate(slc []string) []string {
 	return re
 }
 
-// RegIpv4Address 匹配ipv4
+// RegIpv4Address Match IPv4 addresses
 func RegIpv4Address(context string) string {
 	matched, err := regexp.MatchString("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}", context)
 	if err != nil {
@@ -127,14 +128,14 @@ func HandleIps(ip string) ([]string, error) {
 
 	if strings.Contains(ip, ".txt") {
 		if strings.ToLower(path.Ext(filepath.Base(ip))) == ".txt" {
-			// 文件后缀为.txt的话,我们按照文件解析并获取数据结果
+			// If the file extension is .txt, we parse the file and get the data results
 			Unprocessed, err = ReadFile(ip)
 			if err != nil {
 				return []string{}, err
 			}
 		}
 		/*
-			这里获取到的数据格式可能为
+			The data format obtained here may be:
 			192.168.248.1/24
 			192.168.248.1-155
 			www.baidu.com
@@ -142,7 +143,7 @@ func HandleIps(ip string) ([]string, error) {
 			https://www.baidu.com
 		*/
 
-		// 第一波解析开始，解析ip地址格式
+		// First wave of parsing begins, parsing IP address formats
 		for _, i := range Unprocessed {
 			switch {
 			case RegIpv4Address(i) != "" && (strings.Count(i, "/24") == 1 || strings.Count(i, "/16") == 1):
@@ -171,14 +172,14 @@ func HandleIps(ip string) ([]string, error) {
 				basic = append(basic, i)
 			}
 		}
-		// 第一波解析完成，开始第二波解析，解析域名
-		basic = Duplicate(basic) // 第一次去重
+		// First wave of parsing complete, starting second wave of parsing for domain names
+		basic = Duplicate(basic) // First deduplication
 		basic, err = ConvertDomainToIpAddress(basic, 100)
 		if err != nil {
 			logger.Fatal("parse domain has an error", err.Error())
 			return nil, err
 		}
-		basic = Duplicate(basic) // 第二次去重
+		basic = Duplicate(basic) // Second deduplication
 	} else {
 		basic, err = ConvertIpFormatAll(ip)
 		if err != nil {
@@ -186,7 +187,7 @@ func HandleIps(ip string) ([]string, error) {
 			return []string{}, err
 		}
 	}
-	// 二次筛选
+	// Secondary filtering
 	var newBasic []string
 	for _, ip := range basic {
 		if strings.Contains(ip, "/") {
@@ -195,12 +196,12 @@ func HandleIps(ip string) ([]string, error) {
 			newBasic = append(newBasic, ip)
 		}
 	}
-	// 对获取到的ip地址进行排序进行后续操作
+	// Sort the obtained IP addresses for subsequent operations
 	sort.Strings(newBasic)
 	return newBasic, err
 }
 
-// ConvertIpFormatA 不解析192.168.248.1/8格式目前
+// ConvertIpFormatA Currently does not parse 192.168.248.1/8 format
 func ConvertIpFormatA(ip string) ([]string, error) {
 	var ip4 = net.ParseIP(strings.Split(ip, "/")[0])
 	if ip4 == nil {

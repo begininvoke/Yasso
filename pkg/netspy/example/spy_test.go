@@ -25,7 +25,7 @@ func getCidrIpRange(cidr string) (string, string) {
 		ipPrefix + strconv.Itoa(seg3MaxIp) + "." + strconv.Itoa(seg4MaxIp)
 }
 
-//计算得到CIDR地址范围内可拥有的主机数量
+// 计算得到CIDR地址范围内可拥有的主机数量
 func getCidrHostNum(maskLen int) uint {
 	cidrIpNum := uint(0)
 	var i uint = uint(32 - maskLen - 1)
@@ -35,9 +35,9 @@ func getCidrHostNum(maskLen int) uint {
 	return cidrIpNum
 }
 
-//获取Cidr的掩码
+// 获取Cidr的掩码
 func getCidrIpMask(maskLen int) string {
-	// ^uint32(0)二进制为32个比特1，通过向左位移，得到CIDR掩码的二进制
+	// ^uint32(0) binary is 32 bits of 1, by left shifting, get the CIDR mask binary
 	cidrMask := ^uint32(0) << uint(32-maskLen)
 	fmt.Println(fmt.Sprintf("%b \n", cidrMask))
 	//计算CIDR掩码的四个片段，将想要得到的片段移动到内存最低8位后，将其强转为8位整型，从而得到
@@ -49,7 +49,7 @@ func getCidrIpMask(maskLen int) string {
 	return fmt.Sprint(cidrMaskSeg1) + "." + fmt.Sprint(cidrMaskSeg2) + "." + fmt.Sprint(cidrMaskSeg3) + "." + fmt.Sprint(cidrMaskSeg4)
 }
 
-//得到第三段IP的区间（第一片段.第二片段.第三片段.第四片段）
+// 得到第三段IP的区间（第一片段.第二片段.第三片段.第四片段）
 func getIpSeg3Range(ipSegs []string, maskLen int) (int, int) {
 	if maskLen > 24 {
 		segIp, _ := strconv.Atoi(ipSegs[2])
@@ -59,14 +59,14 @@ func getIpSeg3Range(ipSegs []string, maskLen int) (int, int) {
 	return getIpSegRange(uint8(ipSeg), uint8(24-maskLen))
 }
 
-//得到第四段IP的区间（第一片段.第二片段.第三片段.第四片段）
+// 得到第四段IP的区间（第一片段.第二片段.第三片段.第四片段）
 func getIpSeg4Range(ipSegs []string, maskLen int) (int, int) {
 	ipSeg, _ := strconv.Atoi(ipSegs[3])
 	segMinIp, segMaxIp := getIpSegRange(uint8(ipSeg), uint8(32-maskLen))
 	return segMinIp + 1, segMaxIp
 }
 
-//根据用户输入的基础IP地址和CIDR掩码计算一个IP片段的区间
+// 根据用户输入的基础IP地址和CIDR掩码计算一个IP片段的区间
 func getIpSegRange(userSegIp, offset uint8) (int, int) {
 	var ipSegMax uint8 = 255
 	netSegIp := ipSegMax << offset

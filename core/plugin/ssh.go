@@ -6,7 +6,6 @@ import (
 	"Yasso/core/utils"
 	"bytes"
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"net"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func SshConnByUser(info config.ServiceConn, user, pass string) (*ssh.Client, bool, error) {
@@ -90,7 +91,7 @@ func VersionSSH(info config.ServiceConn) string {
 	return ""
 }
 
-// sshConn 连接到tcp
+// sshConn Connect to TCP
 func sshConn(info config.ServiceConn) ([]byte, error) {
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%v:%v", info.Hostname, info.Port), time.Duration(info.Timeout))
 	if err != nil {
