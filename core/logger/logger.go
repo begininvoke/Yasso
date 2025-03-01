@@ -4,9 +4,10 @@ import (
 	"Yasso/config"
 	"encoding/json"
 	"fmt"
-	"github.com/gookit/color"
 	"os"
 	"sync"
+
+	"github.com/gookit/color"
 )
 
 var (
@@ -84,24 +85,24 @@ func Fatal(in ...interface{}) {
 	fmt.Println(fmt.Sprintf("[%s] ", Red("#")) + fmt.Sprint(all...))
 }
 
-// JSONSave 保存json格式数据
+// JSONSave Save data in JSON format
 func JSONSave(host string, t int, in ...interface{}) {
 	if LogJson != "" {
 		switch t {
 		case VulnerabilitySave:
 			for _, v := range config.JSONSave {
-				// 服务存在
+				// Service exists
 				if v.Host == host {
 					v.Vulnerability = append(v.Vulnerability, in[0].(string))
 				}
 			}
 		case PortSave:
-			// 端口存储
+			// Port storage
 			var flag = false
 			for _, v := range config.JSONSave {
-				// 服务存在
+				// Service exists
 				if v.Host == host {
-					v.Port = in[0].([]int) // 将端口存储
+					v.Port = in[0].([]int) // Store the port
 					flag = true
 				}
 			}
@@ -110,73 +111,73 @@ func JSONSave(host string, t int, in ...interface{}) {
 					Host: host,
 				})
 				for _, v := range config.JSONSave {
-					// 服务存在
+					// Service exists
 					if v.Host == host {
-						v.Port = in[0].([]int) // 将端口存储
+						v.Port = in[0].([]int) // Store the port
 						flag = true
 					}
 				}
 			}
 		case HostSave:
-			// 主机存储
+			// Host storage
 			config.JSONSave = append(config.JSONSave, &config.Format{
 				Host: host,
 			})
 		case WeakPassSave:
-			// 这里存储json的服务弱口令
+			// Store service weak passwords in JSON
 			for _, v := range config.JSONSave {
-				// 服务名称已经有了,那么将口令加到它的WeakPass种
-				// 如果主机之前也是存活的
+				// Service name already exists, add the password to its WeakPass
+				// If the host was previously alive
 				if v.Host == host {
-					// 遍历主机的服务列表
+					// Traverse the host's service list
 					var flag = false
 					for _, value := range v.Service {
-						if value.Name == in[0].(string) { // 服务名
+						if value.Name == in[0].(string) { // Service name
 							value.WeakPass = append(value.WeakPass, in[1].(map[string]string))
-							flag = true // 证明服务存在
+							flag = true // Indicates service exists
 						}
 					}
-					// 证明host存在
+					// Host exists
 					if flag == false {
 						v.Service = append(v.Service, &config.Service{
-							Name:     in[0].(string), //服务名
+							Name:     in[0].(string), // Service name
 							WeakPass: []map[string]string{in[1].(map[string]string)},
 						})
 					}
-					// 证明host存在
+					// Host exists
 					if flag == false {
 						v.Service = append(v.Service, &config.Service{
-							Name:     in[0].(string), //服务名
+							Name:     in[0].(string), // Service name
 							WeakPass: []map[string]string{in[1].(map[string]string)},
 						})
 					}
 				}
 			}
 		case 4:
-			// 这里information字段
+			// Information field
 			for _, v := range config.JSONSave {
-				// 服务名称已经有了,那么将口令加到它的WeakPass种
-				// 如果主机之前也是存活的
+				// Service name already exists, add the password to its WeakPass
+				// If the host was previously alive
 				if v.Host == host {
-					// 遍历主机的服务列表
+					// Traverse the host's service list
 					var flag = false
 					for _, value := range v.Service {
-						if value.Name == in[0].(string) { // 服务名
+						if value.Name == in[0].(string) { // Service name
 							value.Information = append(value.Information, in[1].(string))
-							flag = true // 证明服务存在
+							flag = true // Indicates service exists
 						}
 					}
-					// 证明host存在
+					// Host exists
 					if flag == false {
 						v.Service = append(v.Service, &config.Service{
-							Name:        in[0].(string), //服务名
+							Name:        in[0].(string), // Service name
 							Information: []string{in[1].(string)},
 						})
 					}
 				}
 			}
 		}
-		// 将以json格式保存,文件将会保存全局变量存储的结果集
+		// Save in JSON format, the file will save the result set stored in the global variable
 	}
 }
 
@@ -189,11 +190,11 @@ func LoggerSave() {
 		}
 		filePtr, err := os.Create(LogJson)
 		if err != nil {
-			fmt.Println("文件创建失败", err.Error())
+			fmt.Println("File creation failed", err.Error())
 			return
 		}
 		defer filePtr.Close()
-		// 创建Json编码器
+		// Create JSON encoder
 		_, _ = filePtr.Write(body)
 	}
 }

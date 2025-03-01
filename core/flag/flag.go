@@ -4,32 +4,33 @@ import (
 	"Yasso/core/logger"
 	"Yasso/core/plugin"
 	"Yasso/pkg/exploit"
-	"github.com/spf13/cobra"
 	"os"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 type allFlags struct {
-	Hosts     string // 全局变量 标识ip列表或文件路径
-	Ports     string // 全局变量 标识扫描的端口
-	Timeout   int    // 全局变量 标识超时时间
-	NoCrack   bool   // 全局变量 标识all模块是否开启爆破
-	NoAlive   bool   // 全局变量 是否采用ping来判断存活主机
-	User      string // 全局变量 标识all模块爆破使用用户名字典
-	Pass      string // 全局变量 标识all模块爆破使用密码字典
-	Thread    int    // 全局变量 标识all模块扫描时的线程数
-	NoService bool   // 全局变量 标识all模块是否探测服务
-	NoVulcan  bool   // 全局变量 标识all模块是否进行主机层漏扫
+	Hosts     string // Global variable: identifies IP list or file path
+	Ports     string // Global variable: identifies ports to scan
+	Timeout   int    // Global variable: identifies timeout duration
+	NoCrack   bool   // Global variable: identifies whether to enable brute force in all module
+	NoAlive   bool   // Global variable: whether to use ping to determine live hosts
+	User      string // Global variable: identifies username dictionary for all module brute force
+	Pass      string // Global variable: identifies password dictionary for all module brute force
+	Thread    int    // Global variable: identifies thread count for all module scanning
+	NoService bool   // Global variable: identifies whether to detect services in all module
+	NoVulcan  bool   // Global variable: identifies whether to perform host-level vulnerability scanning in all module
 }
 
 type BurpFlags struct {
-	Hosts   string // 全局变量，标识ip列表或文件路径
-	Method  string // 爆破的服务名称
-	User    string // 爆破时采用的用户字典
-	Pass    string // 爆破时采用的密码字典
-	Thread  int    // 爆破时采用的线程数
-	Timeout int    // 爆破的超时时间
-	IsAlive bool   // 爆破前是否检测存活
+	Hosts   string // Global variable: identifies IP list or file path
+	Method  string // Service name to brute force
+	User    string // Username dictionary used for brute force
+	Pass    string // Password dictionary used for brute force
+	Thread  int    // Thread count used for brute force
+	Timeout int    // Timeout for brute force
+	IsAlive bool   // Whether to check if host is alive before brute force
 }
 
 var burp BurpFlags
@@ -77,28 +78,28 @@ var ExpCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&logger.LogFile, "output", "result.txt", "set logger file")
-	allCmd.Flags().StringVar(&logger.LogJson, "json", "", "设置json格式输出文件")
-	allCmd.Flags().StringVarP(&all.Hosts, "hosts", "H", "", "设置扫描的目标参数(.eg) \n[192.168.248.1/24]\n[192.168.248.1-255]\n[example.txt]")
-	allCmd.Flags().StringVar(&all.Ports, "ports", "", "设置扫描的端口参数(.eg) null将采用默认端口号 top 1000")
-	allCmd.Flags().IntVar(&all.Timeout, "timeout", 1, "设置扫描的超时时间 默认1秒")
-	allCmd.Flags().BoolVar(&all.NoCrack, "no-crack", false, "设置扫描时是否爆破脆弱服务")
-	allCmd.Flags().BoolVar(&all.NoAlive, "no-alive", false, "设置扫描时是否先检测主机存活")
-	allCmd.Flags().StringVar(&all.User, "user-dic", "", "设置扫描时爆破采用的用户名字典 (.eg) null将采用默认用户名字典")
-	allCmd.Flags().StringVar(&all.Pass, "pass-dic", "", "设置扫描时爆破采用的密码字典 (.eg) null将采用默认密码字典")
-	allCmd.Flags().IntVar(&all.Thread, "thread", 500, "设置扫描时的扫描线程 (.eg) 默认500 线程")
-	allCmd.Flags().BoolVar(&all.NoService, "no-service", false, "设置扫描时是否探测服务")
-	allCmd.Flags().BoolVar(&all.NoVulcan, "no-vuln", false, "设置扫描时是否检测主机层漏洞")
+	allCmd.Flags().StringVar(&logger.LogJson, "json", "", "Set JSON format output file")
+	allCmd.Flags().StringVarP(&all.Hosts, "hosts", "H", "", "Set scan target parameters (.eg) \n[192.168.248.1/24]\n[192.168.248.1-255]\n[example.txt]")
+	allCmd.Flags().StringVar(&all.Ports, "ports", "", "Set port parameters for scanning (.eg) null will use default port number top 1000")
+	allCmd.Flags().IntVar(&all.Timeout, "timeout", 1, "Set scan timeout, default 1 second")
+	allCmd.Flags().BoolVar(&all.NoCrack, "no-crack", false, "Set whether to brute force vulnerable services during scanning")
+	allCmd.Flags().BoolVar(&all.NoAlive, "no-alive", false, "Set whether to first detect if host is alive during scanning")
+	allCmd.Flags().StringVar(&all.User, "user-dic", "", "Set username dictionary used for brute force during scanning (.eg) null will use default username dictionary")
+	allCmd.Flags().StringVar(&all.Pass, "pass-dic", "", "Set password dictionary used for brute force during scanning (.eg) null will use default password dictionary")
+	allCmd.Flags().IntVar(&all.Thread, "thread", 500, "Set scanning thread count (.eg) default 500 threads")
+	allCmd.Flags().BoolVar(&all.NoService, "no-service", false, "Set whether to detect services during scanning")
+	allCmd.Flags().BoolVar(&all.NoVulcan, "no-vuln", false, "Set whether to detect host-level vulnerabilities during scanning")
 	rootCmd.AddCommand(allCmd)
-	serviceCmd.Flags().StringVarP(&burp.Hosts, "hosts", "H", "", "设置扫描的目标参数(.eg) \n[192.168.248.1/24]\n[192.168.248.1-255]\n[example.txt]")
-	serviceCmd.Flags().StringVar(&burp.Method, "module", "", "指定要爆破的服务名称(.eg) \n[mssql,ftp,ssh,mysql,rdp,postgres,redis,winrm,smb,mongo]\n以逗号分割,可同时爆破多个服务(--module ssh:22,mysql:3306,rdp:3389)")
-	serviceCmd.Flags().IntVar(&burp.Thread, "thread", 500, "设置扫描时的扫描线程 (.eg) 默认500 线程")
-	serviceCmd.Flags().StringVar(&burp.User, "user-dic", "", "设置扫描时爆破采用的用户名字典 (.eg) null将采用默认用户名字典")
-	serviceCmd.Flags().StringVar(&burp.Pass, "pass-dic", "", "设置扫描时爆破采用的密码字典 (.eg) null将采用默认密码字典")
-	serviceCmd.Flags().IntVar(&burp.Timeout, "timeout", 1, "设置爆破的超时时间 默认1秒")
-	serviceCmd.Flags().BoolVar(&burp.IsAlive, "is-alive", true, "爆破前是否进行ping检测存活")
+	serviceCmd.Flags().StringVarP(&burp.Hosts, "hosts", "H", "", "Set scan target parameters (.eg) \n[192.168.248.1/24]\n[192.168.248.1-255]\n[example.txt]")
+	serviceCmd.Flags().StringVar(&burp.Method, "module", "", "Specify service name to brute force (.eg) \n[mssql,ftp,ssh,mysql,rdp,postgres,redis,winrm,smb,mongo]\nSeparated by commas, can brute force multiple services simultaneously (--module ssh:22,mysql:3306,rdp:3389)")
+	serviceCmd.Flags().IntVar(&burp.Thread, "thread", 500, "Set scanning thread count (.eg) default 500 threads")
+	serviceCmd.Flags().StringVar(&burp.User, "user-dic", "", "Set username dictionary used for brute force during scanning (.eg) null will use default username dictionary")
+	serviceCmd.Flags().StringVar(&burp.Pass, "pass-dic", "", "Set password dictionary used for brute force during scanning (.eg) null will use default password dictionary")
+	serviceCmd.Flags().IntVar(&burp.Timeout, "timeout", 1, "Set brute force timeout, default 1 second")
+	serviceCmd.Flags().BoolVar(&burp.IsAlive, "is-alive", true, "Whether to perform ping detection for alive hosts before brute force")
 	rootCmd.AddCommand(serviceCmd)
 	rootCmd.AddCommand(ExpCmd)
-	// 利用模块命令
+	// Exploitation module commands
 	ExpCmd.AddCommand(exploit.MssqlCmd)
 	ExpCmd.AddCommand(exploit.SshCmd)
 	ExpCmd.AddCommand(exploit.WinRmCmd)
