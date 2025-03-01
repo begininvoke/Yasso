@@ -144,16 +144,9 @@ func JSONSave(host string, t int, in ...interface{}) {
 							WeakPass: []map[string]string{in[1].(map[string]string)},
 						})
 					}
-					// Host exists
-					if flag == false {
-						v.Service = append(v.Service, &config.Service{
-							Name:     in[0].(string), // Service name
-							WeakPass: []map[string]string{in[1].(map[string]string)},
-						})
-					}
 				}
 			}
-		case 4:
+		case InformationSave:
 			// Information field
 			for _, v := range config.JSONSave {
 				// Service name already exists, add the password to its WeakPass
@@ -177,8 +170,9 @@ func JSONSave(host string, t int, in ...interface{}) {
 				}
 			}
 		}
-		// Save in JSON format, the file will save the result set stored in the global variable
 	}
+	// Also save to CSV if enabled
+	CSVSave(host, t, in...)
 }
 
 func LoggerSave() {

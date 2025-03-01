@@ -79,6 +79,7 @@ var ExpCmd = &cobra.Command{
 func init() {
 	rootCmd.PersistentFlags().StringVar(&logger.LogFile, "output", "result.txt", "set logger file")
 	allCmd.Flags().StringVar(&logger.LogJson, "json", "", "Set JSON format output file")
+	allCmd.Flags().StringVar(&logger.LogCSV, "csv", "", "Set CSV format output file")
 	allCmd.Flags().StringVarP(&all.Hosts, "hosts", "H", "", "Set scan target parameters (.eg) \n[192.168.248.1/24]\n[192.168.248.1-255]\n[example.txt]")
 	allCmd.Flags().StringVar(&all.Ports, "ports", "", "Set port parameters for scanning (.eg) null will use default port number top 1000")
 	allCmd.Flags().IntVar(&all.Timeout, "timeout", 1, "Set scan timeout, default 1 second")
